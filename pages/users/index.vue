@@ -1,10 +1,9 @@
 <template lang="pug">
   .users-page
     v-data-table.users-page__table(:headers="headers" :items="users" :options.sync="options"
-                                   :server-items-length="totalUsers" :loading="loading")
+      :server-items-length="totalUsers" :loading="loading" @update:options="applyFilters")
       template(v-slot:item.buttons="{ item }")
-        v-btn(depressed color="primary" nuxt :to="`/users/${item.id}`")
-          | Открыть
+        v-btn(depressed color="primary" nuxt :to="`/users/${item.id}`") Открыть
       template(v-slot:top)
         table
           tbody
@@ -17,12 +16,11 @@
                 v-text-field.mx-4(v-model="filters.username" label="Никнейм")
               td
                 v-text-field.mx-4(v-model="filters.email" label="E-mail")
+              td
+                v-btn(depressed color="primary" @click="() => applyFilters(options, true)") Применить
 </template>
 
 <script>
-import debounce from 'lodash.debounce';
-import startCase from 'lodash.startcase'
-
 export default {
   name: 'UsersIndexPage',
   data() {
@@ -37,53 +35,29 @@ export default {
         {text: 'E-mail', value: 'email'},
         {text: 'Переход', value: 'buttons'}
       ],
-      options: {
-        itemPerPage: 5,
-        multiSort: true
-      },
+      options: {},
       filters: {
-        id: null,
-        name: null,
-        username: null,
-        email: null
+        id: '',
+        name: '',
+        username: '',
+        email: ''
       }
     }
   },
   computed: {
     loading() {
       return this.$fetchState.pending || this.isLoading
-    },
-    preparedFilters() {
-      return {
-        id: this.filters.id,
-        name: startCase(this.filters.name),
-        username: this.filters.username,
-        email: this.filters.email
-      }
     }
   },
   watch: {
-    options: {
-      handler() {
-        this.getUsers();
-      },
-      deep: true,
-    },
-    filters: {
-      handler() {
-        this.debouncedGetUsers();
-      },
-      deep: true,
+    '$route.query': function() {
+      this.init();
+      this.getUsers();
     }
   },
   fetch() {
+    this.init();
     this.getUsers();
-  },
-  created() {
-    this.debouncedGetUsers = debounce(this.getUsers, 500);
-  },
-  beforeDestroy() {
-    this.debouncedGetUsers.cancel();
   },
   methods: {
     async getUsers() {
@@ -93,11 +67,34 @@ export default {
         sortDesc: this.options.sortDesc,
         limit: this.options.itemsPerPage,
         page: this.options.page,
-        filters: this.preparedFilters
+        filters: this.filters
       })
       this.users = users
       this.totalUsers = totalUsers
       this.isLoading = false
+    },
+    init() {
+      this.options = {
+        page: +(this.$route.query.page || 1),
+        itemsPerPage: +(this.$route.query.itemsPerPage || 5),
+        sortBy: [this.$route.query.sortBy || []].flat(),
+        sortDesc: [this.$route.query.sortDesc || []].flat(),
+        groupBy: [this.$route.query.groupBy || []].flat(),
+        groupDesc: [this.$route.query.groupDesc || []].flat(),
+        multiSort: true,
+        mustSort: this.$route.query.mustSort || false
+      }
+      this.filters = {
+        id: this.$route.query.id || '',
+        name: this.$route.query.name || '',
+        username: this.$route.query.username || '',
+        email: this.$route.query.email || ''
+      }
+    },
+    applyFilters(options, resetPage = false) {
+      this.$router.push({name: this.$route.name, query: {
+        ...this.filters, ...options, page: resetPage ? '1' : options.page
+      }})
     }
   }
 }

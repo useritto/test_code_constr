@@ -4,7 +4,7 @@
       v-col(cols='12')
         v-card.post-card(v-if="post && user" dark)
           v-app-bar(dark color="dark")
-            v-btn(icon tile depressed nuxt plain to="/posts" color="primary")
+            v-btn(icon tile depressed plain @click="$router.go(-1)" color="primary")
               v-icon mdi-chevron-left
             v-toolbar-title Пост пользователя {{ user.name }} # {{ post.id }}
             v-spacer

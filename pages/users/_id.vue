@@ -2,7 +2,7 @@
   .user-page
     v-card.mx-auto(v-if="user" max-width="375")
       v-app-bar(dark color="dark")
-        v-btn(icon tile depressed nuxt plain to="/users" color="primary")
+        v-btn(icon tile depressed plain @click="$router.go(-1)" color="primary")
           v-icon mdi-chevron-left
         v-spacer
         v-toolbar-title {{ user.name }}

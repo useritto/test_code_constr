@@ -15,7 +15,7 @@
         PostCard.mb-2(v-for="post in posts" :key="post.id" :post="post")
 
     .posts-page__pagination-wrapper.text-center
-      v-pagination.posts-page__pagination(v-model="pagination.page" :length="totalPages" :total-visible="7")
+      v-pagination.posts-page__pagination(v-model="pagination.page" @input="search" :length="totalPages" :total-visible="7")
 </template>
 
 <script>
@@ -40,14 +40,13 @@ export default {
     }
   },
   watch: {
-    pagination: {
-      handler() {
-        this.getPostsData();
-      },
-      deep: true,
+    '$route.query': function() {
+      this.init();
+      this.getPostsData();
     }
   },
   fetch() {
+    this.init();
     this.getPostsData();
   },
   methods: {
@@ -65,6 +64,16 @@ export default {
     onSubmit(event) {
       event.preventDefault()
       this.getPostsData()
+    },
+    init() {
+      this.searchQuery = this.$route.query.q || ''
+      this.pagination = {
+        page: +(this.$route.query.page || 1),
+        limit: +(this.$route.query.limit || 10)
+      }
+    },
+    search(page) {
+      this.$router.push({name: this.$route.name, query: {q: this.searchQuery, page: page}})
     }
   }
 }
