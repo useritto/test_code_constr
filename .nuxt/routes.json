@@ -1,0 +1,30 @@
+[
+  {
+    "name": "posts",
+    "path": "/posts",
+    "component": "C:\\\\Users\\\\Илья\\\\Desktop\\\\Github\\\\test_code_constr\\\\pages\\\\posts\\\\index.vue",
+    "chunkName": "pages/posts/index",
+    "_name": "_7e88072e"
+  },
+  {
+    "name": "users",
+    "path": "/users",
+    "component": "C:\\\\Users\\\\Илья\\\\Desktop\\\\Github\\\\test_code_constr\\\\pages\\\\users\\\\index.vue",
+    "chunkName": "pages/users/index",
+    "_name": "_58dbe714"
+  },
+  {
+    "name": "posts-id",
+    "path": "/posts/:id",
+    "component": "C:\\\\Users\\\\Илья\\\\Desktop\\\\Github\\\\test_code_constr\\\\pages\\\\posts\\\\_id.vue",
+    "chunkName": "pages/posts/_id",
+    "_name": "_7e7ff5de"
+  },
+  {
+    "name": "users-id",
+    "path": "/users/:id",
+    "component": "C:\\\\Users\\\\Илья\\\\Desktop\\\\Github\\\\test_code_constr\\\\pages\\\\users\\\\_id.vue",
+    "chunkName": "pages/users/_id",
+    "_name": "_4ea09e7c"
+  }
+]
