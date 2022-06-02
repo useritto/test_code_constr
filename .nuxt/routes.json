@@ -26,5 +26,12 @@
     "component": "C:\\\\Users\\\\Илья\\\\Desktop\\\\Github\\\\test_code_constr\\\\pages\\\\users\\\\_id.vue",
     "chunkName": "pages/users/_id",
     "_name": "_4ea09e7c"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "C:\\\\Users\\\\Илья\\\\Desktop\\\\Github\\\\test_code_constr\\\\pages\\\\index.vue",
+    "chunkName": "pages/index",
+    "_name": "_894f1910"
   }
 ]
