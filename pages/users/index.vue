@@ -16,11 +16,11 @@
                 v-text-field.mx-4(v-model="filters.username" label="Никнейм")
               td
                 v-text-field.mx-4(v-model="filters.email" label="E-mail")
-              td
-                v-btn(depressed color="primary" @click="() => applyFilters(options, true)") Применить
 </template>
 
 <script>
+import debounce from 'lodash.debounce'
+
 export default {
   name: 'UsersIndexPage',
   data() {
@@ -53,6 +53,12 @@ export default {
     '$route.query': function() {
       this.init();
       this.getUsers();
+    },
+    filters: {
+      handler () {
+        this.debouncedApplyFilters(this.options, true)
+      },
+      deep: true
     }
   },
   fetch() {
@@ -84,18 +90,22 @@ export default {
         multiSort: true,
         mustSort: this.$route.query.mustSort || false
       }
-      this.filters = {
-        id: this.$route.query.id || '',
-        name: this.$route.query.name || '',
-        username: this.$route.query.username || '',
-        email: this.$route.query.email || ''
-      }
+      this.$set(this.filters, 'id', this.$route.query.id || '')
+      this.$set(this.filters, 'name', this.$route.query.name || '')
+      this.$set(this.filters, 'username', this.$route.query.username || '')
+      this.$set(this.filters, 'email', this.$route.query.email || '')
     },
     applyFilters(options, resetPage = false) {
-      this.$router.push({name: this.$route.name, query: {
+      this.$router.replace({name: this.$route.name, query: {
         ...this.filters, ...options, page: resetPage ? '1' : options.page
       }})
     }
+  },
+  created () {
+    this.debouncedApplyFilters = debounce(this.applyFilters, 500)
+  }, 
+  beforeUnmount() {
+    this.debouncedApplyFilters.cancel() 
   }
 }
 </script>

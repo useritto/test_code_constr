@@ -1,14 +1,12 @@
 <template lang="pug">
   div.posts-page
-    form(@submit="onSubmit")
-      v-text-field.posts-page__search-text-field(
-        v-model="searchQuery"
-        label="Поиск по заголовкам"
-        clearable
-        append-outer-icon="mdi-magnify"
-        @click:append-outer="getPostsData"
-        outlined
-      )
+    v-text-field.posts-page__search-text-field(
+      v-model="searchQuery"
+      label="Поиск"
+      clearable
+      append-outer-icon="mdi-magnify"
+      outlined
+    )
 
     v-row(dense v-if="posts")
       v-col.posts-page__post-list(cols='12')
@@ -19,6 +17,8 @@
 </template>
 
 <script>
+import debounce from 'lodash.debounce'
+
 export default {
   name: 'PostsIndexPage',
   data: () => ({
@@ -43,6 +43,12 @@ export default {
     '$route.query': function() {
       this.init();
       this.getPostsData();
+    },
+    searchQuery: {
+      handler () {
+        this.debouncedSearch()
+      },
+      deep: true
     }
   },
   fetch() {
@@ -61,10 +67,6 @@ export default {
       this.totalPosts = totalPosts;
       this.isLoading = false
     },
-    onSubmit(event) {
-      event.preventDefault()
-      this.getPostsData()
-    },
     init() {
       this.searchQuery = this.$route.query.q || ''
       this.pagination = {
@@ -73,8 +75,14 @@ export default {
       }
     },
     search(page) {
-      this.$router.push({name: this.$route.name, query: {q: this.searchQuery, page: page}})
+      this.$router.replace({name: this.$route.name, query: {q: this.searchQuery, page: page}})
     }
+  },
+  created () {
+    this.debouncedSearch = debounce(this.search, 500)
+  },
+  beforeUnmount () {
+    this.debouncedSearch.cancel()
   }
 }
 </script>
