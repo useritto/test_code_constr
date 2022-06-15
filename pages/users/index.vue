@@ -1,7 +1,7 @@
 <template lang="pug">
   .users-page
     v-data-table.users-page__table(:headers="headers" :items="users" :options.sync="options"
-      :server-items-length="totalUsers" :loading="loading" @update:options="applyFilters")
+      :loading="loading" @update:options="applyFilters")
       template(v-slot:item.buttons="{ item }")
         v-btn(depressed color="primary" nuxt :to="`/users/${item.id}`") Открыть
       template(v-slot:top)
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import debounce from 'lodash.debounce'
 
 export default {
@@ -26,8 +27,6 @@ export default {
   data() {
     return {
       isLoading: false,
-      users: [],
-      totalUsers: 0,
       headers: [
         {text: 'Id пользователя', align: 'start', value: 'id'},
         {text: 'Имя', value: 'name'},
@@ -45,8 +44,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('users', ['filteredUsers']),
     loading() {
       return this.$fetchState.pending || this.isLoading
+    },
+    users() {
+      return this.filteredUsers(this.filters)
     }
   },
   watch: {
@@ -66,17 +69,10 @@ export default {
     this.getUsers();
   },
   methods: {
+    ...mapActions('users', ['fetchUsers']),
     async getUsers() {
       this.isLoading = true
-      const {users, totalUsers} = await this.$api.users.usersGet({
-        sortBy: this.options.sortBy,
-        sortDesc: this.options.sortDesc,
-        limit: this.options.itemsPerPage,
-        page: this.options.page,
-        filters: this.filters
-      })
-      this.users = users
-      this.totalUsers = totalUsers
+      await this.fetchUsers()
       this.isLoading = false
     },
     init() {
@@ -103,9 +99,9 @@ export default {
   },
   created () {
     this.debouncedApplyFilters = debounce(this.applyFilters, 500)
-  }, 
+  },
   beforeUnmount() {
-    this.debouncedApplyFilters.cancel() 
+    this.debouncedApplyFilters.cancel()
   }
 }
 </script>
